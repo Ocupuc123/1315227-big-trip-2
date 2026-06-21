@@ -1,3 +1,4 @@
+import { mockPoints } from '../mock/point.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import PointFormView from '../view/point-form-view.js';
@@ -6,7 +7,7 @@ import PointView from '../view/point-view.js';
 import InfoView from '../view/info-view.js';
 import { render, RenderPosition } from '../render.js';
 
-const POINT_COUNT = 3;
+console.log(mockPoints);
 
 export default class TripPresenter {
   filterComponent = new FilterView();
@@ -28,7 +29,7 @@ export default class TripPresenter {
     render(this.pointListComponent, this.eventContainer);
     render(this.pointFormComponent, this.pointListComponent.getElement());
 
-    for (let i = 0; i < POINT_COUNT; i++) {
+    for (let i = 0; i < mockPoints.length; i++) {
       render(new PointView(), this.pointListComponent.getElement());
     }
   }
