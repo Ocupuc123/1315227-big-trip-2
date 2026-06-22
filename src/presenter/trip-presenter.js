@@ -13,21 +13,24 @@ export default class TripPresenter {
   pointFormComponent = new PointFormView();
   infoComponent = new InfoView();
 
-  constructor({filterContainer, eventContainer, infoContainer}) {
+  constructor({filterContainer, eventContainer, infoContainer, pointsModel}) {
     this.filterContainer = filterContainer;
     this.eventContainer = eventContainer;
     this.infoContainer = infoContainer;
+    this.pointsModel = pointsModel;
   }
 
   init() {
+    this.points = [...this.pointsModel.getPoints()];
+
     render(this.infoComponent, this.infoContainer, RenderPosition.AFTERBEGIN);
     render(this.filterComponent, this.filterContainer);
     render(this.sortComponent, this.eventContainer);
     render(this.pointListComponent, this.eventContainer);
     render(this.pointFormComponent, this.pointListComponent.getElement());
 
-    for (let i = 0; i < mockPoints.length; i++) {
-      render(new PointView(), this.pointListComponent.getElement());
+    for (let i = 0; i < this.points.length; i++) {
+      render(new PointView({point: this.points[i]}), this.pointListComponent.getElement());
     }
   }
 }
