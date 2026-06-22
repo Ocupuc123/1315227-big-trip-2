@@ -1,4 +1,3 @@
-import { mockPoints } from '../mock/point.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
 import PointFormView from '../view/point-form-view.js';
@@ -6,8 +5,6 @@ import PointListView from '../view/point-list-view.js';
 import PointView from '../view/point-view.js';
 import InfoView from '../view/info-view.js';
 import { render, RenderPosition } from '../render.js';
-
-console.log(mockPoints);
 
 export default class TripPresenter {
   filterComponent = new FilterView();
