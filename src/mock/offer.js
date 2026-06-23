@@ -1,4 +1,4 @@
-import { OFFER_TITLES, OFFER_PRICES, TYPES, OfferRandomRange, GroupOfferRandomRange } from '../const.js';
+import { OFFER_TITLES, OFFER_PRICES, TYPES, OfferRandomRange } from '../const.js';
 import { getRandomArrayElement, generateId, getRandomInt } from '../utils.js';
 
 const createOffer = () => ({
@@ -12,6 +12,6 @@ const createGroup = () => ({
   offers: Array.from({ length: getRandomInt(OfferRandomRange.MIN, OfferRandomRange.MAX) }, createOffer)
 });
 
-const mockOffers = Array.from({ length: getRandomInt(GroupOfferRandomRange.MIN, GroupOfferRandomRange.MAX) }, createGroup);
+const mockOffers = TYPES.map(createGroup);
 
 export { mockOffers };

@@ -1,5 +1,5 @@
 import { getRandomArrayElement, generateId, getRandomInt } from '../utils.js';
-import { DESCRIPTIONS, CITIES, PictureRandomRange, DestinationRandomRange } from '../const.js';
+import { TYPES, DESCRIPTIONS, CITIES, PictureRandomRange } from '../const.js';
 
 const createPicture = () => ({
   src: `https://loremflickr.com/248/152?random=${Math.random()}`,
@@ -13,6 +13,6 @@ const createDestination = ()=> ({
   pictures: Array.from({ length: getRandomInt(PictureRandomRange.MIN, PictureRandomRange.MAX) }, createPicture)
 });
 
-const mockDestinations = Array.from({ length: getRandomInt(DestinationRandomRange.MIN, DestinationRandomRange.MAX) }, createDestination);
+const mockDestinations = TYPES.map(createDestination);
 
 export { mockDestinations };
