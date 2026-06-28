@@ -18,25 +18,48 @@ const BLANK_POINT = {
 };
 
 export default class TripPresenter {
-  filterComponent = new FilterView();
-  sortComponent = new SortView();
-  pointListComponent = new PointListView();
-  infoComponent = new InfoView();
+  #filterComponent = new FilterView();
+  #sortComponent = new SortView();
+  #pointListComponent = new PointListView();
+  #infoComponent = new InfoView();
+  #filterContainer;
+  #eventContainer;
+  #infoContainer;
+  #pointsModel;
+  #points;
+  #destinations;
+  #offers;
+  #cities;
 
   constructor({filterContainer, eventContainer, infoContainer, pointsModel}) {
-    this.filterContainer = filterContainer;
-    this.eventContainer = eventContainer;
-    this.infoContainer = infoContainer;
-    this.pointsModel = pointsModel;
+    this.#filterContainer = filterContainer;
+    this.#eventContainer = eventContainer;
+    this.#infoContainer = infoContainer;
+    this.#pointsModel = pointsModel;
   }
 
-  preparePointData(point = BLANK_POINT) {
-    const offerGroup = this.offers.find((group) => group.type === point.type.toLowerCase());
+  init() {
+    this.#points = [...this.#pointsModel.getPoints()];
+    this.#destinations = [...this.#pointsModel.getDestinations()];
+    this.#offers = [...this.#pointsModel.getOffers()];
+    this.#cities = [...this.#pointsModel.getCities()];
+
+    render(this.#infoComponent, this.#infoContainer, RenderPosition.AFTERBEGIN);
+    render(this.#filterComponent, this.#filterContainer);
+    render(this.#sortComponent, this.#eventContainer);
+    render(this.#pointListComponent, this.#eventContainer);
+
+    this.#renderEditForm();
+    this.#renderPoints();
+  }
+
+  #preparePointData(point = BLANK_POINT) {
+    const offerGroup = this.#offers.find((group) => group.type === point.type.toLowerCase());
     const selectedOffers = offerGroup?.offers?.filter((offer) =>
       point.offers.includes(offer.id)
     ) ?? [];
     const allOffers = offerGroup?.offers ?? [];
-    const destination = this.destinations.find(
+    const destination = this.#destinations.find(
       (dest) => dest.id === point.destination) ??
       { name: '', description: '', pictures: [] };
 
@@ -48,8 +71,8 @@ export default class TripPresenter {
     };
   }
 
-  renderEditForm() {
-    const { point, selectedOffers, destination, allOffers } = this.preparePointData(this.points[0]);
+  #renderEditForm() {
+    const { point, selectedOffers, destination, allOffers } = this.#preparePointData(this.#points[0]);
 
     render(new PointEditView({
       point,
@@ -58,33 +81,18 @@ export default class TripPresenter {
       allOffers,
       isNewPoint: false,
       cities: this.cities
-    }), this.pointListComponent.getElement());
+    }), this.#pointListComponent.getElement());
   }
 
-  renderPoints() {
-    for (const point of this.points.slice(1)) {
-      const { selectedOffers, destination } = this.preparePointData(point);
+  #renderPoints() {
+    for (const point of this.#points.slice(1)) {
+      const { selectedOffers, destination } = this.#preparePointData(point);
 
       render(new PointView({
         point,
         selectedOffers,
         destination
-      }), this.pointListComponent.getElement());
+      }), this.#pointListComponent.getElement());
     }
-  }
-
-  init() {
-    this.points = [...this.pointsModel.getPoints()];
-    this.destinations = [...this.pointsModel.getDestinations()];
-    this.offers = [...this.pointsModel.getOffers()];
-    this.cities = [...this.pointsModel.getCities()];
-
-    render(this.infoComponent, this.infoContainer, RenderPosition.AFTERBEGIN);
-    render(this.filterComponent, this.filterContainer);
-    render(this.sortComponent, this.eventContainer);
-    render(this.pointListComponent, this.eventContainer);
-
-    this.renderEditForm();
-    this.renderPoints();
   }
 }
