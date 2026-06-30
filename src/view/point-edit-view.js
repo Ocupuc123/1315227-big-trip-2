@@ -111,11 +111,11 @@ const createPointEditTemplate = (point, selectedOffers, destination, allOffers, 
 
 export default class PointEditView extends AbstractView {
   #point = null;
-  #offers;
-  #destination;
-  #allOffers;
-  #isNewPoint;
-  #cities;
+  #offers = [];
+  #destination = {};
+  #allOffers = [];
+  #isNewPoint = false;
+  #cities = [];
 
   constructor({ point, selectedOffers, destination, allOffers, isNewPoint = false, cities }) {
     super();

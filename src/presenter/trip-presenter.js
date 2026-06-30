@@ -22,14 +22,16 @@ export default class TripPresenter {
   #sortComponent = new SortView();
   #pointListComponent = new PointListView();
   #infoComponent = new InfoView();
-  #filterContainer;
-  #eventContainer;
-  #infoContainer;
-  #pointsModel;
-  #points;
-  #destinations;
-  #offers;
-  #cities;
+
+  #filterContainer = null;
+  #eventContainer = null;
+  #infoContainer = null;
+  #pointsModel = null;
+
+  #points = [];
+  #destinations = [];
+  #offers = [];
+  #cities = [];
 
   constructor({filterContainer, eventContainer, infoContainer, pointsModel}) {
     this.#filterContainer = filterContainer;
@@ -39,10 +41,12 @@ export default class TripPresenter {
   }
 
   init() {
-    this.#points = [...this.#pointsModel.getPoints()];
-    this.#destinations = [...this.#pointsModel.getDestinations()];
-    this.#offers = [...this.#pointsModel.getOffers()];
-    this.#cities = [...this.#pointsModel.getCities()];
+    const { points, destinations, offers, cities } = this.#pointsModel;
+
+    this.#points = [...points];
+    this.#destinations = [...destinations];
+    this.#offers = [...offers];
+    this.#cities = [...cities];
 
     render(this.#infoComponent, this.#infoContainer, RenderPosition.AFTERBEGIN);
     render(this.#filterComponent, this.#filterContainer);

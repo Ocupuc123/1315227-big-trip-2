@@ -9,19 +9,19 @@ export default class PointsModel {
   #points = createMockPoints(this.#destinations, this.#offers);
   #cities = Array.from(new Set(this.#destinations.map((city)=> city.name)));
 
-  getPoints() {
+  get points() {
     return this.#points;
   }
 
-  getDestinations() {
+  get destinations() {
     return this.#destinations;
   }
 
-  getOffers() {
+  get offers() {
     return this.#offers;
   }
 
-  getCities() {
+  get cities() {
     return this.#cities;
   }
 }
