@@ -5,6 +5,8 @@ import PointListView from '../view/point-list-view.js';
 import PointView from '../view/point-view.js';
 import InfoView from '../view/info-view.js';
 import NoPointView from '../view/no-point-view.js';
+import { createFilter } from '../mock/filter.js';
+import { FilterType, SortType } from '../const.js';
 import { render, replace, RenderPosition } from '../framework/render.js';
 
 const BLANK_POINT = {
@@ -19,11 +21,7 @@ const BLANK_POINT = {
 };
 
 export default class TripPresenter {
-  #filterComponent = new FilterView();
-  #sortComponent = new SortView();
   #pointListComponent = new PointListView();
-  #infoComponent = new InfoView();
-  #noPointComponent = new NoPointView();
 
   #filterContainer = null;
   #eventContainer = null;
@@ -34,9 +32,12 @@ export default class TripPresenter {
   #destinations = [];
   #offers = [];
   #cities = [];
+  #filters = [];
 
   #currentPointComponent = null;
   #currentEditComponent = null;
+  #travelDates = {};
+  #currentSortType = SortType.DAY;
 
   constructor({filterContainer, eventContainer, infoContainer, pointsModel}) {
     this.#filterContainer = filterContainer;
@@ -48,12 +49,51 @@ export default class TripPresenter {
   init() {
     const { points, destinations, offers, cities } = this.#pointsModel;
 
-    this.#points = [...points];
+    const sortedPoints = [...points].sort((a, b) =>
+      new Date(a.dateFrom) - new Date(b.dateFrom)
+    );
+
+    const firstPoint = sortedPoints[0];
+    const lastPoint = sortedPoints[sortedPoints.length - 1];
+
+    this.#travelDates = {
+      dateFrom: firstPoint.dateFrom,
+      dateTo: lastPoint.dateTo
+    };
+
+    this.#points = sortedPoints;
     this.#destinations = [...destinations];
     this.#offers = [...offers];
     this.#cities = [...cities];
+    this.#filters = createFilter(this.#points);
 
     this.#renderTripBoard();
+  }
+
+  #getTotalCost() {
+    return this.#points.reduce((total, point) => {
+      const { selectedOffers } = this.#preparePointData(point);
+      const offersPrice = selectedOffers.reduce((sum, offer) => sum + offer.price, 0);
+      return total + point.basePrice + offersPrice;
+    }, 0);
+  }
+
+  #getCitiesForRoute() {
+    const routeCities = this.#points
+      .map((point) => {
+        const destination = this.#destinations.find((dest) => dest.id === point.destination);
+        return destination ? destination.name : '';
+      })
+      .filter(Boolean);
+
+    const filteredCities = routeCities.filter((city, index, array) => {
+      if (index === 0) {
+        return true;
+      }
+      return city !== array[index - 1];
+    });
+
+    return filteredCities;
   }
 
   #preparePointData(point = BLANK_POINT) {
@@ -134,15 +174,19 @@ export default class TripPresenter {
   }
 
   #renderTripBoard() {
-    render(this.#filterComponent, this.#filterContainer);
+    render(new FilterView({filters: this.#filters}), this.#filterContainer);
 
     if (!this.#points.length) {
-      render(this.#noPointComponent, this.#eventContainer);
+      render(new NoPointView({filterType: FilterType.EVERYTHING}), this.#eventContainer);
       return;
     }
 
-    render(this.#infoComponent, this.#infoContainer, RenderPosition.AFTERBEGIN);
-    render(this.#sortComponent, this.#eventContainer);
+    render(new InfoView({
+      cities: this.#getCitiesForRoute(),
+      travelDates: this.#travelDates,
+      totalCost: this.#getTotalCost()
+    }), this.#infoContainer, RenderPosition.AFTERBEGIN);
+    render(new SortView({currentSortType: this.#currentSortType}), this.#eventContainer);
     render(this.#pointListComponent, this.#eventContainer);
 
     for (const point of this.#points) {

@@ -70,7 +70,58 @@ const DateFormat = {
   ISO_DATE: 'YYYY-MM-DD',
   ISO_DATETIME_MINUTES: 'YYYY-MM-DDTHH:mm',
   TIME_ONLY: 'HH:mm',
-  INPUT_DATE: 'DD/MM/YY'
+  INPUT_DATE: 'DD/MM/YY',
+  DAY_MONTH: 'D MMM'
 };
 
-export { DESCRIPTIONS, TYPES, CITIES, PRICES, OFFER_TITLES, OFFER_PRICES, DESTINATION_COUNT, PictureRandomRange, PictureSrcRandomRange, OfferRandomRange, GroupOfferRandomRange, DateRange, DurationRange, DateFormat };
+const FilterType = {
+  'EVERYTHING': 'Everything',
+  'FUTURE': 'Future',
+  'PRESENT': 'Present',
+  'PAST': 'Past'
+};
+
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
+};
+
+const SORT_TYPES = [
+  {
+    type: SortType.DAY,
+    label: 'Day',
+    disabled: false
+  },
+  {
+    type: SortType.EVENT,
+    label: 'Event',
+    disabled: true
+  },
+  {
+    type: SortType.TIME,
+    label: 'Time',
+    disabled: false
+  },
+  {
+    type: SortType.PRICE,
+    label: 'Price',
+    disabled: false
+  },
+  {
+    type: SortType.OFFER,
+    label: 'Offers',
+    disabled: true
+  }
+];
+
+const NoPointMessage = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.PAST]: 'Past — \'There are no past events now\''
+};
+
+export { DESCRIPTIONS, TYPES, CITIES, PRICES, OFFER_TITLES, OFFER_PRICES, DESTINATION_COUNT, SORT_TYPES, PictureRandomRange, PictureSrcRandomRange, OfferRandomRange, GroupOfferRandomRange, DateRange, DurationRange, DateFormat, FilterType, SortType, NoPointMessage };
