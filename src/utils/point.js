@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { DateRange, DurationRange } from '../const.js';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 dayjs.extend(duration);
 dayjs.extend(isSameOrBefore);
