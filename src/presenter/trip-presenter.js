@@ -14,6 +14,7 @@ export default class TripPresenter {
   #sortComponent = null;
   #filterComponent = null;
   #noPointComponent = null;
+  #pointPresenters = new Map();
 
   #filterContainer = null;
   #eventContainer = null;
@@ -87,14 +88,6 @@ export default class TripPresenter {
     return filteredCities;
   }
 
-  #renderPoint(point) {
-    const pointPresenter = new PointPresenter({
-      pointListContainer: this.#pointListComponent.element
-    });
-
-    pointPresenter.init(point, this.#destinations, this.#offers, this.#cities);
-  }
-
   #renderInfo() {
     this.#infoComponent = new InfoView({
       cities: this.#getCitiesForRoute(),
@@ -111,8 +104,13 @@ export default class TripPresenter {
     render(this.#sortComponent, this.#eventContainer);
   }
 
-  #renderList() {
+  #renderPointList() {
     render(this.#pointListComponent, this.#eventContainer);
+  }
+
+  #clearPointList() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
   }
 
   #renderFilter() {
@@ -125,6 +123,15 @@ export default class TripPresenter {
     this.#noPointComponent = new NoPointView({ filterType: FilterType.EVERYTHING });
 
     render(this.#noPointComponent, this.#eventContainer);
+  }
+
+  #renderPoint(point) {
+    const pointPresenter = new PointPresenter({
+      pointListContainer: this.#pointListComponent.element
+    });
+
+    pointPresenter.init(point, this.#destinations, this.#offers, this.#cities);
+    this.#pointPresenters.set(point.id, pointPresenter);
   }
 
   #renderPoints() {
@@ -141,7 +148,7 @@ export default class TripPresenter {
 
     this.#renderInfo();
     this.#renderSort();
-    this.#renderList();
+    this.#renderPointList();
     this.#renderPoints();
   }
 }
