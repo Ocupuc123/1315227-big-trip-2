@@ -1,24 +1,12 @@
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
-import PointEditView from '../view/point-edit-view.js';
 import PointListView from '../view/point-list-view.js';
-import PointView from '../view/point-view.js';
 import InfoView from '../view/info-view.js';
 import NoPointView from '../view/no-point-view.js';
+import PointPresenter from './point-presenter.js';
 import { createFilter } from '../mock/filter.js';
 import { FilterType, SortType } from '../const.js';
-import { render, replace, RenderPosition } from '../framework/render.js';
-
-const BLANK_POINT = {
-  id: '',
-  basePrice: 0,
-  dateFrom: null,
-  dateTo: null,
-  destination: '',
-  isFavorite: false,
-  offers: [],
-  type: 'flight'
-};
+import { render, RenderPosition } from '../framework/render.js';
 
 export default class TripPresenter {
   #pointListComponent = new PointListView();
@@ -38,8 +26,6 @@ export default class TripPresenter {
   #cities = [];
   #filters = [];
 
-  #currentPointComponent = null;
-  #currentEditComponent = null;
   #travelDates = {};
   #currentSortType = SortType.DAY;
 
@@ -76,7 +62,8 @@ export default class TripPresenter {
 
   #getTotalCost() {
     return this.#points.reduce((total, point) => {
-      const { selectedOffers } = this.#preparePointData(point);
+      const offerGroup = this.#offers.find((group) => group.type === point.type.toLowerCase());
+      const selectedOffers = offerGroup?.offers?.filter((offer) => point.offers.includes(offer.id)) ?? [];
       const offersPrice = selectedOffers.reduce((sum, offer) => sum + offer.price, 0);
       return total + point.basePrice + offersPrice;
     }, 0);
@@ -100,80 +87,12 @@ export default class TripPresenter {
     return filteredCities;
   }
 
-  #preparePointData(point = BLANK_POINT) {
-    const offerGroup = this.#offers.find((group) => group.type === point.type.toLowerCase());
-    const selectedOffers = offerGroup?.offers?.filter((offer) =>
-      point.offers.includes(offer.id)
-    ) ?? [];
-    const allOffers = offerGroup?.offers ?? [];
-    const destination = this.#destinations.find(
-      (dest) => dest.id === point.destination) ??
-      { name: '', description: '', pictures: [] };
-
-    return {
-      selectedOffers,
-      destination,
-      allOffers
-    };
-  }
-
-  #closeEditForm() {
-    if (!this.#currentEditComponent) {
-      return;
-    }
-
-    replace(this.#currentPointComponent, this.#currentEditComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-
-    this.#currentPointComponent = null;
-    this.#currentEditComponent = null;
-  }
-
-  #openEditForm(pointComponent, pointEditComponent) {
-    this.#closeEditForm();
-
-    this.#currentPointComponent = pointComponent;
-    this.#currentEditComponent = pointEditComponent;
-
-    replace(pointEditComponent, pointComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-  }
-
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      this.#closeEditForm();
-    }
-  };
-
   #renderPoint(point) {
-    const { selectedOffers, destination, allOffers } = this.#preparePointData(point);
-
-    const pointEditComponent = new PointEditView({
-      point,
-      selectedOffers,
-      destination,
-      allOffers,
-      isNewPoint: false,
-      cities: this.#cities,
-      onFormSubmit: () => {
-        this.#closeEditForm();
-      },
-      onCloseClick: () => {
-        this.#closeEditForm();
-      }
+    const pointPresenter = new PointPresenter({
+      pointListContainer: this.#pointListComponent.element
     });
 
-    const pointComponent = new PointView({
-      point,
-      selectedOffers,
-      destination,
-      onEditClick: () => {
-        this.#openEditForm(pointComponent, pointEditComponent);
-      }
-    });
-
-    render(pointComponent, this.#pointListComponent.element);
+    pointPresenter.init(point, this.#destinations, this.#offers, this.#cities);
   }
 
   #renderInfo() {
