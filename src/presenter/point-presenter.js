@@ -62,7 +62,7 @@ export default class PointPresenter {
     const { selectedOffers, destination, allOffers } = this.#preparePointData(this.#point);
 
     const prevPointComponent = this.#pointComponent;
-    const prevPointEditComponent = this.#pointListContainer;
+    const prevPointEditComponent = this.#pointEditComponent;
 
     this.#pointEditComponent = new PointEditView({
       point: this.#point,
@@ -85,7 +85,8 @@ export default class PointPresenter {
       destination,
       onEditClick: () => {
         this.#handleEditClick();
-      }
+      },
+      onFavoriteClick: this.#handleFavoriteClick,
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -146,6 +147,13 @@ export default class PointPresenter {
   #handleEditClick() {
     this.#replacePointToForm();
   }
+
+  #handleFavoriteClick = () => {
+    this.#handleDataChange({
+      ...this.#point,
+      isFavorite: !this.#point.isFavorite
+    });
+  };
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
