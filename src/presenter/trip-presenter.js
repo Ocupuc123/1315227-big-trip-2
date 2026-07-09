@@ -6,6 +6,7 @@ import NoPointView from '../view/no-point-view.js';
 import PointPresenter from './point-presenter.js';
 import { createFilter } from '../mock/filter.js';
 import { updateItem } from '../utils/common.js';
+import { sortPointPrice, sortPointTime } from '../utils/point.js';
 import { FilterType, SortType } from '../const.js';
 import { render, RenderPosition } from '../framework/render.js';
 
@@ -30,6 +31,7 @@ export default class TripPresenter {
 
   #travelDates = {};
   #currentSortType = SortType.DAY;
+  #sourcedPoints = [];
 
   constructor({filterContainer, eventContainer, infoContainer, pointsModel}) {
     this.#filterContainer = filterContainer;
@@ -40,6 +42,8 @@ export default class TripPresenter {
 
   init() {
     const { points, destinations, offers, cities } = this.#pointsModel;
+
+    this.#sourcedPoints = [...points];
 
     const sortedPoints = [...points].sort((a, b) =>
       new Date(a.dateFrom) - new Date(b.dateFrom)
@@ -158,8 +162,24 @@ export default class TripPresenter {
     this.#renderPoints();
   }
 
+  #sortPoints(sortType) {
+    switch (sortType) {
+      case SortType.PRICE:
+        this.#points.sort(sortPointPrice);
+        break;
+      case SortType.TIME:
+        this.#points.sort(sortPointTime);
+        break;
+      default:
+        this.#points = [...this.#sourcedPoints];
+    }
+
+    this.#currentSortType = sortType;
+  }
+
   #handlePointChange = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
+    this.#sourcedPoints = updateItem(this.#sourcedPoints, updatedPoint);
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
@@ -168,7 +188,11 @@ export default class TripPresenter {
   };
 
   #handleSortTypeChange = (sortType) => {
-    // - Сортируем задачи
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
     // - Очищаем список
     // - Рендерим список заново
   };

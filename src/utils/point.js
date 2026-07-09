@@ -51,4 +51,13 @@ const getDurationInPoint = (dateFrom, dateTo) => {
   return `${pad(days)}D ${pad(hours)}H ${pad(minutes)}M`;
 };
 
-export { generateId, getRandomPointDates, formatPointDate, getDurationInPoint, isPointFuture, isPointPast, isPointPresent };
+const sortPointPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
+
+const sortPointTime = (pointA, pointB) => {
+  const durationA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const durationB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+
+  return durationB - durationA;
+};
+
+export { generateId, getRandomPointDates, formatPointDate, getDurationInPoint, isPointFuture, isPointPast, isPointPresent, sortPointPrice, sortPointTime };
