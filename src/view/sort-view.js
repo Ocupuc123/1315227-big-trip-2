@@ -15,13 +15,27 @@ const createSortTemplate = (currentSortType) => `<form class="trip-events__trip-
 
 export default class SortView extends AbstractView {
   #currentSortType = null;
+  #handleSortTypeChange = null;
 
-  constructor({currentSortType}) {
+  constructor({currentSortType, onSortChange}) {
     super();
     this.#currentSortType = currentSortType;
+    this.#handleSortTypeChange = onSortChange;
+
+    this.#setEventListeners();
   }
 
   get template() {
     return createSortTemplate(this.#currentSortType);
   }
+
+  #setEventListeners() {
+    this.element.addEventListener('change', this.#sortTypeChangeHandler);
+  }
+
+  #sortTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    const currentSortType = evt.target.dataset.sortType;
+    this.#handleSortTypeChange(currentSortType);
+  };
 }

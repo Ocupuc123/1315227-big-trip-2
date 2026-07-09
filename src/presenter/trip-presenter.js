@@ -100,7 +100,10 @@ export default class TripPresenter {
   }
 
   #renderSort() {
-    this.#sortComponent = new SortView({ currentSortType: this.#currentSortType });
+    this.#sortComponent = new SortView({
+      currentSortType: this.#currentSortType,
+      onSortChange: this.#handleSortTypeChange
+    });
 
     render(this.#sortComponent, this.#eventContainer);
   }
@@ -162,5 +165,11 @@ export default class TripPresenter {
 
   #handleModeChange = ()=> {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    // - Сортируем задачи
+    // - Очищаем список
+    // - Рендерим список заново
   };
 }
