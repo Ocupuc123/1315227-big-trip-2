@@ -43,8 +43,6 @@ export default class TripPresenter {
   init() {
     const { points, destinations, offers, cities } = this.#pointsModel;
 
-    this.#sourcedPoints = [...points];
-
     const sortedPoints = [...points].sort((a, b) =>
       new Date(a.dateFrom) - new Date(b.dateFrom)
     );
@@ -57,11 +55,13 @@ export default class TripPresenter {
       dateTo: lastPoint.dateTo
     };
 
-    this.#points = sortedPoints;
+    this.#points = [...sortedPoints];
     this.#destinations = [...destinations];
     this.#offers = [...offers];
     this.#cities = [...cities];
     this.#filters = createFilter(this.#points);
+
+    this.#sourcedPoints = [...sortedPoints];
 
     this.#renderTripBoard();
   }
@@ -116,11 +116,6 @@ export default class TripPresenter {
     render(this.#pointListComponent, this.#eventContainer);
   }
 
-  #clearPointList() {
-    this.#pointPresenters.forEach((presenter) => presenter.destroy());
-    this.#pointPresenters.clear();
-  }
-
   #renderFilter() {
     this.#filterComponent = new FilterView({ filters: this.#filters });
 
@@ -131,6 +126,11 @@ export default class TripPresenter {
     this.#noPointComponent = new NoPointView({ filterType: FilterType.EVERYTHING });
 
     render(this.#noPointComponent, this.#eventContainer);
+  }
+
+  #clearPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
   }
 
   #renderPoint(point) {
@@ -193,7 +193,7 @@ export default class TripPresenter {
     }
 
     this.#sortPoints(sortType);
-    // - Очищаем список
-    // - Рендерим список заново
+    this.#clearPoints();
+    this.#renderPoints();
   };
 }
