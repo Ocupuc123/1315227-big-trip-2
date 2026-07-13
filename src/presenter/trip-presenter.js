@@ -6,8 +6,8 @@ import NoPointView from '../view/no-point-view.js';
 import PointPresenter from './point-presenter.js';
 import { createFilter } from '../mock/filter.js';
 import { updateItem } from '../utils/common.js';
-import { sortPointPrice, sortPointTime, sortPointDay } from '../utils/point.js';
-import { FilterType, SortType } from '../const.js';
+import { sortPointPrice, sortPointTime, sortPointDay, generateId } from '../utils/point.js';
+import { FilterType, SortType, BLANK_POINT } from '../const.js';
 import { render, RenderPosition } from '../framework/render.js';
 
 export default class TripPresenter {
@@ -62,6 +62,8 @@ export default class TripPresenter {
     this.#sourcedPoints = [...sortedPointsByDay];
 
     this.#renderTripBoard();
+
+    document.querySelector('.trip-main__event-add-btn').addEventListener('click', ()=> this.#createNewPoint());
   }
 
   #getTotalCost() {
@@ -89,6 +91,21 @@ export default class TripPresenter {
     });
 
     return filteredCities;
+  }
+
+  #createNewPoint() {
+    const newPoint = {
+      ...BLANK_POINT,
+      id: generateId(),
+    };
+
+    this.#points = [newPoint, ...this.#points];
+    this.#sourcedPoints = [newPoint, ...this.#sourcedPoints];
+
+    this.#renderPoint(newPoint, true);
+
+    const presenter = this.#pointPresenters.get(newPoint.id);
+    presenter.openEditForm();
   }
 
   #renderInfo() {
@@ -122,14 +139,14 @@ export default class TripPresenter {
     render(this.#noPointComponent, this.#eventContainer);
   }
 
-  #renderPoint(point) {
+  #renderPoint(point, isNewPoint = false) {
     const pointPresenter = new PointPresenter({
       pointListContainer: this.#pointListComponent.element,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange
     });
 
-    pointPresenter.init(point, this.#destinations, this.#offers, this.#cities);
+    pointPresenter.init(point, this.#destinations, this.#offers, this.#cities, isNewPoint);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 

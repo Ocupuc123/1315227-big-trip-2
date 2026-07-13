@@ -62,4 +62,11 @@ const sortPointTime = (pointA, pointB) => {
   return durationB - durationA;
 };
 
-export { generateId, getRandomPointDates, formatPointDate, getDurationInPoint, isPointFuture, isPointPast, isPointPresent, sortPointPrice, sortPointTime, sortPointDay };
+const getOffersByType = (type, offers) => {
+  const offerGroup = offers.find((group) => group.type === type.toLowerCase());
+  const offersByType = offerGroup?.offers ?? [];
+
+  return offersByType;
+};
+
+export { generateId, getRandomPointDates, formatPointDate, getDurationInPoint, isPointFuture, isPointPast, isPointPresent, sortPointPrice, sortPointTime, sortPointDay, getOffersByType };
