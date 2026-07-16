@@ -124,8 +124,8 @@ export default class PointEditView extends AbstractStatefulView {
   #allOffers = [];
   #allDestinations = [];
   #initialOffersByType = [];
-  #startDatepicker = null;
-  #endDatepicker = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
 
   constructor({ point, offers, destinations, isNewPoint = false, cities, onFormSubmit, onCloseClick }) {
     super();
@@ -169,14 +169,14 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   #removeDatepicker() {
-    if (this.#startDatepicker) {
-      this.#startDatepicker.destroy();
-      this.#startDatepicker = null;
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
     }
 
-    if (this.#endDatepicker) {
-      this.#endDatepicker.destroy();
-      this.#endDatepicker = null;
+    if (this.#datepickerTo) {
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
     }
   }
 
@@ -190,18 +190,18 @@ export default class PointEditView extends AbstractStatefulView {
       }
     );
 
-    this.#startDatepicker = createDatepicker(
+    this.#datepickerFrom = createDatepicker(
       this.element.querySelector('[name="event-start-time"]'),
-      this.#startDateCloseHandler,
+      this.#dateFromCloseHandler,
       {
         maxDate: this._state.dateTo,
         defaultDate: this._state.dateFrom
       }
     );
 
-    this.#endDatepicker = createDatepicker(
+    this.#datepickerTo = createDatepicker(
       this.element.querySelector('[name="event-end-time"]'),
-      this.#endDateCloseHandler,
+      this.#dateToCloseHandler,
       {
         minDate: this._state.dateFrom,
         defaultDate: this._state.dateTo
@@ -247,13 +247,13 @@ export default class PointEditView extends AbstractStatefulView {
     this.#handleFormSubmit(PointEditView.parseStateToPoint(this._state));
   };
 
-  #startDateCloseHandler = ([dateFrom]) => {
+  #dateFromCloseHandler = ([dateFrom]) => {
     this.updateElement({
       dateFrom
     });
   };
 
-  #endDateCloseHandler = ([dateTo]) => {
+  #dateToCloseHandler = ([dateTo]) => {
     this.updateElement({
       dateTo
     });
