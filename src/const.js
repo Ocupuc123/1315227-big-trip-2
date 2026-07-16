@@ -77,8 +77,8 @@ const DateFormat = {
 const BLANK_POINT = {
   id: '',
   basePrice: 0,
-  dateFrom: null,
-  dateTo: null,
+  dateFrom: new Date().toISOString(),
+  dateTo: new Date().toISOString(),
   destination: '',
   isFavorite: false,
   offers: [],
