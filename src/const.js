@@ -87,7 +87,8 @@ const BLANK_POINT = {
 
 const DATEPICKER_CONFIG = {
   dateFormat: 'd/m/y H:i',
-  enableTime: true
+  enableTime: true,
+  'time_24hr': true,
 };
 
 const FilterType = {
