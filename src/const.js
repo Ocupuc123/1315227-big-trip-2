@@ -85,6 +85,11 @@ const BLANK_POINT = {
   type: 'flight'
 };
 
+const DATEPICKER_CONFIG = {
+  dateFormat: 'd/m/y H:i',
+  enableTime: true
+};
+
 const FilterType = {
   'EVERYTHING': 'Everything',
   'FUTURE': 'Future',
@@ -140,4 +145,4 @@ const NoPointMessage = {
   [FilterType.PAST]: 'Past — \'There are no past events now\''
 };
 
-export { DESCRIPTIONS, TYPES, CITIES, PRICES, OFFER_TITLES, OFFER_PRICES, DESTINATION_COUNT, SORT_TYPES, PictureRandomRange, PictureSrcRandomRange, OfferRandomRange, GroupOfferRandomRange, DateRange, DurationRange, DateFormat, FilterType, SortType, NoPointMessage, BLANK_POINT };
+export { DESCRIPTIONS, TYPES, CITIES, PRICES, OFFER_TITLES, OFFER_PRICES, DESTINATION_COUNT, SORT_TYPES, PictureRandomRange, PictureSrcRandomRange, OfferRandomRange, GroupOfferRandomRange, DateRange, DurationRange, DateFormat, FilterType, SortType, NoPointMessage, BLANK_POINT, DATEPICKER_CONFIG };

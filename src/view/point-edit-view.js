@@ -1,7 +1,9 @@
 import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { TYPES, DateFormat } from '../const.js';
+import { TYPES, DATEPICKER_CONFIG, DateFormat } from '../const.js';
 import { formatPointDate, getOffersByType } from '../utils/point.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createEventTypeItems = (currentType, id) => TYPES.map((type) => {
   const isChecked = type.toLowerCase() === currentType;
@@ -122,6 +124,8 @@ export default class PointEditView extends AbstractStatefulView {
   #allOffers = [];
   #allDestinations = [];
   #initialOffersByType = [];
+  #startDatepicker = null;
+  #endDatepicker = null;
 
   constructor({ point, offers, destinations, isNewPoint = false, cities, onFormSubmit, onCloseClick }) {
     super();
@@ -143,6 +147,12 @@ export default class PointEditView extends AbstractStatefulView {
     return createPointEditTemplate(this._state, this.#isNewPoint, this.#cities);
   }
 
+  removeElement() {
+    super.removeElement();
+
+    this.#removeDatepicker();
+  }
+
   resetState() {
     const newState = PointEditView.parsePointToState(
       this.#point,
@@ -155,6 +165,48 @@ export default class PointEditView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.#setEventListeners();
+    this.#setDatepicker();
+  }
+
+  #removeDatepicker() {
+    if (this.#startDatepicker) {
+      this.#startDatepicker.destroy();
+      this.#startDatepicker = null;
+    }
+
+    if (this.#endDatepicker) {
+      this.#endDatepicker.destroy();
+      this.#endDatepicker = null;
+    }
+  }
+
+  #setDatepicker() {
+    const createDatepicker = (selector, onClose, additionalConfig = {}) => flatpickr(
+      selector,
+      {
+        ...DATEPICKER_CONFIG,
+        ...additionalConfig,
+        onClose
+      }
+    );
+
+    this.#startDatepicker = createDatepicker(
+      this.element.querySelector('[name="event-start-time"]'),
+      this.#startDateCloseHandler,
+      {
+        maxDate: this._state.dateTo,
+        defaultDate: this._state.dateFrom
+      }
+    );
+
+    this.#endDatepicker = createDatepicker(
+      this.element.querySelector('[name="event-end-time"]'),
+      this.#endDateCloseHandler,
+      {
+        minDate: this._state.dateFrom,
+        defaultDate: this._state.dateTo
+      }
+    );
   }
 
   #setEventListeners() {
@@ -193,6 +245,18 @@ export default class PointEditView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSubmit(PointEditView.parseStateToPoint(this._state));
+  };
+
+  #startDateCloseHandler = ([dateFrom]) => {
+    this.updateElement({
+      dateFrom
+    });
+  };
+
+  #endDateCloseHandler = ([dateTo]) => {
+    this.updateElement({
+      dateTo
+    });
   };
 
   #handleTypeChange = (newType)=> {
