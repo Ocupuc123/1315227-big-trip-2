@@ -74,6 +74,17 @@ const DateFormat = {
   DAY_MONTH: 'D MMM'
 };
 
+const BLANK_POINT = {
+  id: '',
+  basePrice: 0,
+  dateFrom: null,
+  dateTo: null,
+  destination: '',
+  isFavorite: false,
+  offers: [],
+  type: 'flight'
+};
+
 const FilterType = {
   'EVERYTHING': 'Everything',
   'FUTURE': 'Future',
@@ -129,4 +140,4 @@ const NoPointMessage = {
   [FilterType.PAST]: 'Past — \'There are no past events now\''
 };
 
-export { DESCRIPTIONS, TYPES, CITIES, PRICES, OFFER_TITLES, OFFER_PRICES, DESTINATION_COUNT, SORT_TYPES, PictureRandomRange, PictureSrcRandomRange, OfferRandomRange, GroupOfferRandomRange, DateRange, DurationRange, DateFormat, FilterType, SortType, NoPointMessage };
+export { DESCRIPTIONS, TYPES, CITIES, PRICES, OFFER_TITLES, OFFER_PRICES, DESTINATION_COUNT, SORT_TYPES, PictureRandomRange, PictureSrcRandomRange, OfferRandomRange, GroupOfferRandomRange, DateRange, DurationRange, DateFormat, FilterType, SortType, NoPointMessage, BLANK_POINT };

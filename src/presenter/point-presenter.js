@@ -1,17 +1,6 @@
 import PointEditView from '../view/point-edit-view.js';
 import PointView from '../view/point-view.js';
-import { render, replace, remove } from '../framework/render.js';
-
-const BLANK_POINT = {
-  id: '',
-  basePrice: 0,
-  dateFrom: null,
-  dateTo: null,
-  destination: '',
-  isFavorite: false,
-  offers: [],
-  type: 'flight'
-};
+import { render, replace, remove, RenderPosition } from '../framework/render.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -27,6 +16,7 @@ export default class PointPresenter {
   #destinations = [];
   #offers = [];
   #cities = [];
+  #isNewPoint = false;
   #mode = Mode.DEFAULT;
 
   #handleDataChange = null;
@@ -38,13 +28,18 @@ export default class PointPresenter {
     this.#handleModeChange = onModeChange;
   }
 
-  init(point, destinations = this.#destinations, offers = this.#offers, cities = this.#cities) {
+  init(point, destinations = this.#destinations, offers = this.#offers, cities = this.#cities, isNewPoint) {
     this.#point = point;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#cities = cities;
+    this.#isNewPoint = isNewPoint;
 
     this.#renderPoint();
+  }
+
+  openEditForm() {
+    this.#replacePointToForm();
   }
 
   destroy() {
@@ -58,39 +53,54 @@ export default class PointPresenter {
     }
   }
 
+  #preparePointData(point) {
+    const offerGroup = this.#offers.find((group) => group.type === point.type.toLowerCase());
+    const selectedOffers = offerGroup?.offers?.filter((offer) =>
+      point.offers.includes(offer.id)
+    ) ?? [];
+
+    const destination = this.#destinations.find(
+      (dest) => dest.id === point.destination) ??
+      { name: '', description: '', pictures: [] };
+
+    return {
+      selectedOffers,
+      destination
+    };
+  }
+
   #renderPoint() {
-    const { selectedOffers, destination, allOffers } = this.#preparePointData(this.#point);
+    const { selectedOffers, destination } = this.#preparePointData(this.#point);
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
 
     this.#pointEditComponent = new PointEditView({
       point: this.#point,
-      selectedOffers,
-      destination,
-      allOffers,
-      isNewPoint: false,
+      destinations: this.#destinations,
+      offers: this.#offers,
+      isNewPoint: this.#isNewPoint,
       cities: this.#cities,
-      onFormSubmit: () => {
-        this.#handleFormSubmit();
-      },
-      onCloseClick: () => {
-        this.#handleCloseClick();
-      }
+      onFormSubmit: this.#handleFormSubmit,
+      onCloseClick: this.#handleCloseClick
     });
 
     this.#pointComponent = new PointView({
       point: this.#point,
       selectedOffers,
       destination,
-      onEditClick: () => {
-        this.#handleEditClick();
-      },
+      onEditClick: this.#handleEditClick,
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
+      if (this.#isNewPoint) {
+        render(this.#pointComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
+        return;
+      }
+
       render(this.#pointComponent, this.#pointListContainer);
+
       return;
     }
 
@@ -106,23 +116,6 @@ export default class PointPresenter {
     remove(prevPointEditComponent);
   }
 
-  #preparePointData(point = BLANK_POINT) {
-    const offerGroup = this.#offers.find((group) => group.type === point.type.toLowerCase());
-    const selectedOffers = offerGroup?.offers?.filter((offer) =>
-      point.offers.includes(offer.id)
-    ) ?? [];
-    const allOffers = offerGroup?.offers ?? [];
-    const destination = this.#destinations.find(
-      (dest) => dest.id === point.destination) ??
-      { name: '', description: '', pictures: [] };
-
-    return {
-      selectedOffers,
-      destination,
-      allOffers
-    };
-  }
-
   #replacePointToForm() {
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -131,22 +124,24 @@ export default class PointPresenter {
   }
 
   #replaceFormToPoint() {
+    this.#pointEditComponent.resetState();
     replace(this.#pointComponent, this.#pointEditComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
   }
 
-  #handleCloseClick() {
+  #handleCloseClick = () => {
     this.#replaceFormToPoint();
-  }
+  };
 
-  #handleFormSubmit() {
+  #handleFormSubmit = (point) => {
+    this.#handleDataChange(point);
     this.#replaceFormToPoint();
-  }
+  };
 
-  #handleEditClick() {
+  #handleEditClick = () => {
     this.#replacePointToForm();
-  }
+  };
 
   #handleFavoriteClick = () => {
     this.#handleDataChange({
