@@ -8,7 +8,6 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
 const formatPointDate = (date, format) => date ? dayjs(date).format(format) : '';
-const generateId = () => crypto.randomUUID();
 const isPointFuture = (dateFrom) => dayjs(dateFrom).isAfter(dayjs());
 const isPointPast = (dateTo) => dayjs(dateTo).isBefore(dayjs());
 const isPointPresent = (dateFrom, dateTo) => dayjs(dateFrom).isSameOrBefore(dayjs()) && dayjs(dateTo).isSameOrAfter(dayjs());
@@ -65,4 +64,4 @@ const isOffersEqual = (arrA, arrB) => {
   return arrA.every((item, index) => item === arrB[index]);
 };
 
-export { generateId, formatPointDate, getDurationInPoint, isPointFuture, isPointPast, isPointPresent, sortPointPrice, sortPointTime, sortPointDay, getOffersByType, isDatesEqual, isOffersEqual };
+export { formatPointDate, getDurationInPoint, isPointFuture, isPointPast, isPointPresent, sortPointPrice, sortPointTime, sortPointDay, getOffersByType, isDatesEqual, isOffersEqual };
