@@ -1,6 +1,5 @@
 import PointEditView from '../view/point-edit-view.js';
 import { UserAction, UpdateType } from '../const.js';
-import { generateId } from '../utils/point.js';
 import {remove, render, RenderPosition} from '../framework/render.js';
 
 export default class NewPointPresenter {
@@ -20,6 +19,10 @@ export default class NewPointPresenter {
     this.#destinationsModel = destinationsModel;
   }
 
+  get cities() {
+    return this.#destinationsModel.cities;
+  }
+
   init() {
     if (this.#pointEditComponent !== null) {
       return;
@@ -28,6 +31,7 @@ export default class NewPointPresenter {
     this.#pointEditComponent = new PointEditView({
       destinations: this.#destinationsModel.destinations,
       offers: this.#offersModel.offers,
+      cities: this.cities,
       isNewPoint: true,
       onFormSubmit: this.#handleFormSubmit,
       onDeleteClick: this.#handleDeleteClick
@@ -51,17 +55,19 @@ export default class NewPointPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
+  setSaving() {
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
   #handleFormSubmit = (point) => {
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      {
-        ...point,
-        id: generateId(),
-      },
+      {...point},
     );
-
-    this.destroy();
   };
 
   #handleDeleteClick = () => {

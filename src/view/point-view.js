@@ -12,8 +12,14 @@ const createOffer = (offer) => {
         </li>`;
 };
 
-const createPointTemplate = (point, selectedOffers, destination) => {
-  const { basePrice, isFavorite, type, dateFrom, dateTo } = point;
+const createPointTemplate = ({point, selectedOffers, destination}) => {
+  const {
+    basePrice,
+    isFavorite,
+    type,
+    dateFrom,
+    dateTo
+  } = point;
   const { name } = destination;
 
   return `<li class="trip-events__item">
@@ -68,7 +74,11 @@ export default class PointView extends AbstractView {
   }
 
   get template() {
-    return createPointTemplate(this.#point, this.#selectedOffers, this.#destination);
+    return createPointTemplate({
+      point: this.#point,
+      selectedOffers: this.#selectedOffers,
+      destination: this.#destination
+    });
   }
 
   #setEventListeners() {
