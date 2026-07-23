@@ -292,7 +292,7 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   #validateForm = () => {
-    const { basePrice, selectedDestination } = this._state;
+    const { basePrice } = this._state;
 
     if (basePrice <= 0) {
       return false;
